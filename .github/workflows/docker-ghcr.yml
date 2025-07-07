@@ -25,5 +25,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/gns-dockerfile:latest
+          tags: ghcr.io/naveen-raj-m/gns-dockerfile:latest
 
