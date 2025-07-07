@@ -4,9 +4,10 @@ on:
   push:
     branches:
       - main
+  # you can add other triggers like pull_request if you want
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,12 +19,13 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.CR_PAT }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v4
         with:
           context: .
           push: true
           tags: ghcr.io/naveen-raj-m/gns-dockerfile:latest
+          platforms: linux/arm64
 
