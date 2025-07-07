@@ -1,51 +1,35 @@
-# ------------------------------------------------------------------------------
-# Dockerfile for ARM64  |  CUDA 12.2  |  PyTorch 2.7 (+CU128)  |  PyG compiled
-# ------------------------------------------------------------------------------
+# Use NVIDIA's CUDA devel image (includes nvcc)
+FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04
 
-FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04   #  devel = has nvcc & compilers
-
+# Avoid interactive prompts during package install
 ENV DEBIAN_FRONTEND=noninteractive
 
-# ------------------------------------------------------------------
-# 1. System packages ‑‑ compiler tool‑chain + Python basics
-# ------------------------------------------------------------------
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        python3 python3-pip python3-dev git build-essential \
-        ninja-build cmake pkg-config wget curl ca-certificates \
+# Install system packages
+RUN apt-get update && apt-get install -y \
+    python3 python3-pip git curl gcc g++ \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# ------------------------------------------------------------------
-# 2. Upgrade pip
-# ------------------------------------------------------------------
-RUN pip install --upgrade pip wheel setuptools
+# Upgrade pip
+RUN pip3 install --upgrade pip
 
-# ------------------------------------------------------------------
-# 3. Install CUDA‑enabled PyTorch 2.7.0 (arm64 wheels exist on cu128)
-# ------------------------------------------------------------------
-RUN pip install torch==2.7.0 torchvision==0.18.0 torchaudio==2.7.0 \
-        --index-url https://download.pytorch.org/whl/cu128
+# Install PyTorch for CUDA 12.2 (ARM64)
+RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu122
 
-# ------------------------------------------------------------------
-# 4. Build & install PyTorch‑Geometric + required C++/CUDA ops
-#    ‑ The pip installer will detect nvcc and compile for arm64/SM90.
-# ------------------------------------------------------------------
-ENV TORCH_CUDA_ARCH_LIST="8.0 8.6 9.0 9.0+PTX"
-RUN pip install \
-        torch-scatter \
-        torch-sparse \
-        torch-cluster \
-        torch-spline-conv \
-        -f https://data.pyg.org/whl/torch-2.7.0+cu128.html  && \
-    pip install torch-geometric
+# Install torch-geometric dependencies
+RUN pip3 install \
+    numpy \
+    scipy \
+    sympy \
+    scikit-learn \
+    networkx \
+    requests \
+    tqdm \
+    --extra-index-url https://pytorch-geometric.com/whl/torch-2.2.0+cu122.html
 
-# ------------------------------------------------------------------
-# 5. Your project‑specific Python requirements
-# ------------------------------------------------------------------
-COPY requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt && rm /tmp/requirements.txt
+# Copy your requirements and install
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
 
-# ------------------------------------------------------------------
-# 6. Default entrypoint
-# ------------------------------------------------------------------
-CMD ["/bin/bash"]
+# Default command (optional)
+CMD ["python3"]
 
