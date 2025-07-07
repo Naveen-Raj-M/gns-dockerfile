@@ -1,0 +1,20 @@
+# Core ML and Data libraries
+numpy==1.23.1
+h5py
+tensorboard
+
+# Visualization and Utilities
+matplotlib
+pyevtk
+pyvista
+tqdm
+toml
+absl-py
+dm-tree
+
+# Development and Code Quality
+black
+hydra-core
+ipython
+ipykernel
+pytest
