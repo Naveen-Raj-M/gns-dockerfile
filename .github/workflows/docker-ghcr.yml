@@ -1,8 +1,16 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Log in to GitHub Container Registry
@@ -16,7 +24,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/arm64
           push: true
-          tags: ghcr.io/naveen-raj-m/gns-dockerfile:latest
+          tags: ghcr.io/${{ github.repository_owner }}/gns-dockerfile:latest
 
