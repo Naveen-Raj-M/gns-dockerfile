@@ -33,5 +33,5 @@ jobs:
           context: .
           push: true
           platforms: linux/arm64
-          tags: ghcr.io/${{ github.repository }}:latest
+          tags: ghcr.io/naveen-raj-m/gns-dockerfile:latest
 
