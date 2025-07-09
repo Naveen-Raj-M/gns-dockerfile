@@ -1,35 +1,31 @@
-# Use NVIDIA's CUDA devel image (includes nvcc)
-FROM nvidia/cuda:12.2.2-cudnn8-devel-ubuntu22.04
+# Use NVIDIA PyTorch container for ARM64 with CUDA (supports Grace Hopper)
+FROM nvcr.io/nvidia/pytorch:24.03-py3
 
-# Avoid interactive prompts during package install
+# Avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system packages
+# Install extra system packages if needed
 RUN apt-get update && apt-get install -y \
-    python3 python3-pip git curl gcc g++ \
+    git curl gcc g++ \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip
-RUN pip3 install --upgrade pip
+# Upgrade pip (optional)
+RUN pip install --upgrade pip
 
-# Install PyTorch for CUDA 12.2 (ARM64)
-RUN pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu122
-
-# Install torch-geometric dependencies
-RUN pip3 install \
+# Install additional dependencies for torch-geometric
+RUN pip install \
     numpy \
     scipy \
     sympy \
     scikit-learn \
     networkx \
     requests \
-    tqdm \
-    --extra-index-url https://pytorch-geometric.com/whl/torch-2.2.0+cu122.html
+    tqdm
 
-# Copy your requirements and install
+# Copy and install your requirements
 COPY requirements.txt .
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 
-# Default command (optional)
+# Optional entrypoint
 CMD ["python3"]
 
